@@ -12,9 +12,8 @@ namespace ConsoleReciver
     {
         static void Main(string[] args)
         {
-            Reciver reciver = new Reciver();//Инициализация новой подписки на события
             var factory = new ConnectionFactory() { HostName = "localhost" };//Установка настроек подключения
-            reciver.Init(factory);
+            Reciver reciver = new Reciver(factory);//Инициализация новой подписки на события
         }
     }
 }

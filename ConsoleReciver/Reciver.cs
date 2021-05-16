@@ -4,6 +4,7 @@ using System.Threading;
 using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Collections.Generic;
 
 namespace ConsoleReciver
 {
@@ -12,19 +13,35 @@ namespace ConsoleReciver
         ConnectionFactory factory;
         string queueName;
         bool durable;
+        bool exclusive;
+        bool autoDelete;
+        IDictionary<string, object> arguments;
 
-        public void Init(ConnectionFactory factory)
+        public Reciver(ConnectionFactory factory)
         {
             this.factory = factory;
+            queueName = "hello";
+            durable = false;
+            exclusive = false;
+            autoDelete = true;
+            arguments = null;
             Thread myThread = new Thread(new ThreadStart(InitInNewThread));
             myThread.Start();
         }
-        void Init()
+
+        public Reciver(ConnectionFactory factory, string queueName, bool durable, bool exclusive, bool autoDelete, IDictionary<string,object> arguments = null)
         {
-            Console.WriteLine("Перезапуск");
+            this.factory = factory;
+            this.queueName = queueName;
+            this.durable = durable;
+            this.exclusive = exclusive;
+            this.autoDelete = autoDelete;
+            this.arguments = arguments;
             Thread myThread = new Thread(new ThreadStart(InitInNewThread));
             myThread.Start();
         }
+
+        //TODO: Конструктор подписки на несколько очередей
 
         void InitInNewThread()
         {
@@ -84,8 +101,16 @@ namespace ConsoleReciver
                 Console.WriteLine(ex.Message);
                 Init();
             }
-
         }
+
+        void Init()
+        {
+            Console.WriteLine("Перезапуск");
+            Thread myThread = new Thread(new ThreadStart(InitInNewThread));
+            myThread.Start();
+        }
+
+        //TODO: Проверки для проверки Ack/Reject
 
         bool WriteInBase(string messsage)
         {
